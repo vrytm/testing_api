@@ -1,0 +1,35 @@
+### Canonicalize codeigniter URLs
+
+# Enforce SSL https://www. 
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+###
+# Removes access to the system folder by users.
+# Additionally this will allow you to create a System.php controller,
+# previously this would not have been possible.
+# 'system' can be replaced if you have renamed your system folder.
+RewriteCond %{REQUEST_URI} ^system.*
+RewriteRule ^(.*)$ /index.php/$1 [L]
+
+# Checks to see if the user is attempting to access a valid file,
+# such as an image or css document, if this isn't true it sends the
+# request to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)$ index.php?/$1 [L]
+
+#Disable Directory Listing
+Options -Indexes
+
+# Extra Security Headers
+<IfModule mod_headers.c>
+	Header set X-XSS-Protection "1; mode=block"
+	Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+	Header always append X-Frame-Options SAMEORIGIN
+	Header set X-Content-Type-Options nosniff
+	#Header set Content-Security-Policy "default-src 'self';"
+	Header set X-Permitted-Cross-Domain-Policies "none"
+	Header set Referrer-Policy "no-referrer"
+</IfModule>
